@@ -8,8 +8,9 @@ import (
 
 // RankingManager manages ranking storage
 type RankingManager struct {
-	Database *sql.DB
-	Endpoint *nex.PRUDPEndPoint
+	Database          *sql.DB
+	Endpoint          *nex.PRUDPEndPoint
+	GetUserFriendPIDs func(pid uint32) []uint32
 }
 
 // NewRankingManager returns a new StorageManagerManager

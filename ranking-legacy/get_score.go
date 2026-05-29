@@ -18,15 +18,22 @@ func (commonProtocol *CommonProtocol) getScore(err error, packet nex.PacketInter
 	connection := packet.Sender().(*nex.PRUDPConnection)
 	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
 
-	/* None of the other RankingMode enum values make sense here. They focus on one's "own" score, but without a
-	 * uniqueID, there's no way to select the "own" score. Probably the enum has different semantics on Legacy.
-	 * Unimplemented for now.
-	 */
-	if rankingMode != 0 {
+	var data types.List[rankinglegacytypes.RankingData]
+	var nexErr *nex.Error
+	if rankingMode == 0 {
+		data, nexErr = database.GetGlobalRankings(commonProtocol.manager, category, orderParam, offset, length)
+	} else if rankingMode == 2 && commonProtocol.manager.GetUserFriendPIDs != nil {
+		friends := commonProtocol.manager.GetUserFriendPIDs(uint32(connection.PID()))
+		data, nexErr = database.GetFriendRankings(commonProtocol.manager, friends, category, orderParam, offset, length)
+	} else {
+		/* None of the other RankingMode enum values make sense here. They focus on one's "own" score, but without a
+		 * uniqueID, there's no way to select the "own" score. Probably the enum has different semantics on Legacy.
+		 * Unimplemented for now.
+		 */
 		commonglobals.Logger.Warningf("Ranking mode %v is not implemented! Giving global rankings.", rankingMode)
+		data, nexErr = database.GetGlobalRankings(commonProtocol.manager, category, orderParam, offset, length)
 	}
 
-	data, nexErr := database.GetGlobalRankings(commonProtocol.manager, category, orderParam, offset, length)
 	if nexErr != nil {
 		commonglobals.Logger.Error(nexErr.Error())
 		return nil, nexErr
