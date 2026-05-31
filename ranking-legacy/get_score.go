@@ -6,10 +6,11 @@ import (
 	commonglobals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 	"github.com/PretendoNetwork/nex-protocols-common-go/v2/ranking-legacy/database"
 	rankinglegacy "github.com/PretendoNetwork/nex-protocols-go/v2/ranking/legacy"
+	"github.com/PretendoNetwork/nex-protocols-go/v2/ranking/legacy/constants"
 	rankinglegacytypes "github.com/PretendoNetwork/nex-protocols-go/v2/ranking/legacy/types"
 )
 
-func (commonProtocol *CommonProtocol) getScore(err error, packet nex.PacketInterface, callID uint32, rankingMode types.UInt8, category types.UInt32, orderParam rankinglegacytypes.RankingOrderParam, offset types.UInt32, length types.UInt8) (*nex.RMCMessage, *nex.Error) {
+func (commonProtocol *CommonProtocol) getScore(err error, packet nex.PacketInterface, callID uint32, rankingMode constants.RankingMode, category types.UInt32, orderParam rankinglegacytypes.RankingOrderParam, offset types.UInt32, length types.UInt8) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		commonglobals.Logger.Error(err.Error())
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "change_error")
@@ -20,9 +21,9 @@ func (commonProtocol *CommonProtocol) getScore(err error, packet nex.PacketInter
 
 	var data types.List[rankinglegacytypes.RankingData]
 	var nexErr *nex.Error
-	if rankingMode == 0 {
+	if rankingMode == constants.RankingModeRange {
 		data, nexErr = database.GetGlobalRankings(commonProtocol.manager, category, orderParam, offset, length)
-	} else if rankingMode == 2 && commonProtocol.manager.GetUserFriendPIDs != nil {
+	} else if rankingMode == constants.RankingModeFriendRange && commonProtocol.manager.GetUserFriendPIDs != nil {
 		friends := commonProtocol.manager.GetUserFriendPIDs(uint32(connection.PID()))
 		data, nexErr = database.GetFriendRankings(commonProtocol.manager, friends, category, orderParam, offset, length)
 	} else {
