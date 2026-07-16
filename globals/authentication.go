@@ -40,7 +40,7 @@ func ConnectToAccountGRPC(host string, port uint16, apiKey string) {
 }
 
 // ValidatePNLoginData validates the given NEX login data
-func ValidatePNLoginData(pid types.PID, loginData types.DataHolder, gameServerID string) *nex.Error {
+func ValidatePNLoginData(pid types.PID, loginData types.DataHolder, gameServerIDs []string) *nex.Error {
 	var tokenBase64 string
 
 	loginDataType := loginData.Object.DataObjectID().(types.String)
@@ -72,8 +72,8 @@ func ValidatePNLoginData(pid types.PID, loginData types.DataHolder, gameServerID
 	ctx := metadata.NewOutgoingContext(context.Background(), GRPCAccountCommonMetadata)
 
 	response, err := GRPCAccountClient.ExchangeNEXTokenForUserData(ctx, &pb.ExchangeNEXTokenForUserDataRequest{
-		GameServerId: gameServerID,
-		Token:        tokenBase64,
+		GameServerIds: gameServerIDs,
+		Token:         tokenBase64,
 	})
 	if err != nil {
 		return nex.NewError(nex.ResultCodes.Authentication.ValidationFailed, err.Error())

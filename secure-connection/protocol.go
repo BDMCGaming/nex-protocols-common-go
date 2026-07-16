@@ -32,10 +32,10 @@ func (commonProtocol *CommonProtocol) EnableInsecureRegister() {
 	commonProtocol.allowInsecureRegisterMethod = true
 }
 
-// ConfigurePNValidation configures the servers game server ID for use in validating NEX login data
-func (commonProtocol *CommonProtocol) ConfigurePNValidation(gameServerID string) {
+// ConfigurePNValidation configures the servers game server IDs for use in validating NEX login data
+func (commonProtocol *CommonProtocol) ConfigurePNValidation(gameServerIDs []string) {
 	commonProtocol.ValidateLoginData = func(pid types.PID, loginData types.DataHolder) *nex.Error {
-		return common_globals.ValidatePNLoginData(pid, loginData, gameServerID)
+		return common_globals.ValidatePNLoginData(pid, loginData, gameServerIDs)
 	}
 }
 
