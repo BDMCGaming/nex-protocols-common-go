@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	pb "github.com/PretendoNetwork/grpc/go/account/v2"
@@ -54,16 +53,10 @@ func ValidatePNLoginData(pid types.PID, loginData types.DataHolder, gameServerID
 		accountExtraInfo := loginData.Object.Copy().(account_management_types.AccountExtraInfo)
 
 		tokenBase64 = string(accountExtraInfo.NEXToken)
-		tokenBase64 = strings.Replace(tokenBase64, ".", "+", -1)
-		tokenBase64 = strings.Replace(tokenBase64, "-", "/", -1)
-		tokenBase64 = strings.Replace(tokenBase64, "*", "=", -1)
 	case "AuthenticationInfo": // * 3DS / Wii U
 		authenticationInfo := loginData.Object.Copy().(ticket_granting_types.AuthenticationInfo)
 
 		tokenBase64 = string(authenticationInfo.Token)
-		tokenBase64 = strings.Replace(tokenBase64, ".", "+", -1)
-		tokenBase64 = strings.Replace(tokenBase64, "-", "/", -1)
-		tokenBase64 = strings.Replace(tokenBase64, "*", "=", -1)
 	default:
 		Logger.Errorf("Invalid loginData data type %s!", loginDataType)
 		return nex.NewError(nex.ResultCodes.Authentication.ValidationFailed, fmt.Sprintf("Invalid loginData data type %s!", loginDataType))
