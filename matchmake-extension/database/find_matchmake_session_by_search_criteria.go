@@ -218,11 +218,11 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 			}
 		}
 
-		switch constants.SelectionMethod(searchCriteria.SelectionMethod) {
-		case constants.SelectionMethodRandom:
+		switch searchCriteria.SelectionMethod {
+		case constants.MatchmakeSelectionMethodRandom:
 			// * Random global
 			searchStatement += ` ORDER BY RANDOM()`
-		case constants.SelectionMethodNearestNeighbor:
+		case constants.MatchmakeSelectionMethodNearestNeighbor:
 			// * Closest attribute
 			attribute1, err := strconv.ParseUint(string(searchCriteria.Attribs[1]), 10, 32)
 			if err != nil {
@@ -231,7 +231,7 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 			}
 
 			searchStatement += fmt.Sprintf(` ORDER BY abs(%d - ms.attribs[2])`, attribute1)
-		case constants.SelectionMethodBroadenRange:
+		case constants.MatchmakeSelectionMethodBroadenRange:
 			// * Ranked
 
 			// TODO - Actually implement ranked matchmaking, using closest attribute at the moment
@@ -242,7 +242,7 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 			}
 
 			searchStatement += fmt.Sprintf(` ORDER BY abs(%d - ms.attribs[2])`, attribute1)
-		case constants.SelectionMethodProgressScore:
+		case constants.MatchmakeSelectionMethodProgressScore:
 			// * Progress Score
 
 			// * We can only use this when doing auto-matchmake
@@ -251,7 +251,7 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 			}
 
 			searchStatement += fmt.Sprintf(` ORDER BY abs(%d - ms.progress_score)`, sourceMatchmakeSession.ProgressScore)
-		case constants.SelectionMethodBroadenRangeWithProgressScore:
+		case constants.MatchmakeSelectionMethodBroadenRangeWithProgressScore:
 			// * Ranked + Progress
 
 			// TODO - Actually implement ranked matchmaking, using closest attribute at the moment
@@ -326,7 +326,7 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 				&resultMatchmakeSession.ApplicationBuffer,
 				&resultMatchmakeSession.ProgressScore,
 				&resultMatchmakeSession.SessionKey,
-				&resultMatchmakeSession.Option,
+				&resultMatchmakeSession.Option0,
 				&resultMatchmakeParam,
 				&resultMatchmakeSession.UserPassword,
 				&resultMatchmakeSession.ReferGID,
