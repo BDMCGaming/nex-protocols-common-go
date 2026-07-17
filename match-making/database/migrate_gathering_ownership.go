@@ -29,7 +29,7 @@ func MigrateGatheringOwnership(manager *common_globals.MatchmakingManager, conne
 		uniqueParticipants = common_globals.RemoveDuplicates(participants)
 	}
 
-	var previousOwnerFound bool = false
+	var previousOwnerFound = false
 	for _, participant := range uniqueParticipants {
 		if participant != uint64(gathering.OwnerPID) {
 			newOwner = participant
