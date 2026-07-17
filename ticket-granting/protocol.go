@@ -18,6 +18,7 @@ type CommonProtocol struct {
 	allowInsecureLoginMethod   bool
 	SessionKeyLength           int // TODO - Use server SessionKeyLength?
 	SecureServerAccount        *nex.Account
+	SourceKeyFromToken         func(sourceAccount *nex.Account, loginData types.DataHolder) ([]byte, *nex.Error)
 	ValidateLoginData          func(pid types.PID, loginData types.DataHolder) *nex.Error
 	OnAfterLogin               func(packet nex.PacketInterface, strUserName types.String)
 	OnAfterLoginEx             func(packet nex.PacketInterface, strUserName types.String, oExtraData types.DataHolder)
@@ -35,10 +36,10 @@ func (commonProtocol *CommonProtocol) EnableInsecureLogin() {
 	commonProtocol.allowInsecureLoginMethod = true
 }
 
-// SetPretendoValidation configures the protocol to use Pretendo validation
-func (commonProtocol *CommonProtocol) SetPretendoValidation(aesKey []byte) {
+// ConfigurePNValidation configures the servers game server IDs for use in validating NEX login data
+func (commonProtocol *CommonProtocol) ConfigurePNValidation(gameServerIDs []string) {
 	commonProtocol.ValidateLoginData = func(pid types.PID, loginData types.DataHolder) *nex.Error {
-		return common_globals.ValidatePretendoLoginData(pid, loginData, aesKey)
+		return common_globals.ValidatePNLoginData(pid, loginData, gameServerIDs)
 	}
 }
 

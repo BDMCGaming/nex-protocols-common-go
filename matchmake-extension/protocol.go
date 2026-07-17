@@ -3,8 +3,10 @@ package matchmake_extension
 import (
 	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/types"
+	"github.com/PretendoNetwork/nex-protocols-go/v2/match-making/constants"
 	match_making_types "github.com/PretendoNetwork/nex-protocols-go/v2/match-making/types"
 	matchmake_extension "github.com/PretendoNetwork/nex-protocols-go/v2/matchmake-extension"
+	notifications_constants "github.com/PretendoNetwork/nex-protocols-go/v2/notifications/constants"
 
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 	"github.com/PretendoNetwork/nex-protocols-common-go/v2/matchmake-extension/database"
@@ -39,9 +41,9 @@ type CommonProtocol struct {
 	OnAfterBrowseMatchmakeSession                    func(packet nex.PacketInterface, searchCriteria match_making_types.MatchmakeSessionSearchCriteria, resultRange types.ResultRange)
 	OnAfterJoinMatchmakeSessionEx                    func(packet nex.PacketInterface, gid types.UInt32, strMessage types.String, dontCareMyBlockList types.Bool, participationCount types.UInt16)
 	OnAfterGetSimpleCommunity                        func(packet nex.PacketInterface, gatheringIDList types.List[types.UInt32])
-	OnAfterUpdateNotificationData                    func(packet nex.PacketInterface, uiType types.UInt32, uiParam1 types.UInt32, uiParam2 types.UInt32, strParam types.String)
-	OnAfterGetFriendNotificationData                 func(packet nex.PacketInterface, uiType types.Int32)
-	OnAfterGetlstFriendNotificationData              func(packet nex.PacketInterface, lstTypes types.List[types.UInt32])
+	OnAfterUpdateNotificationData                    func(packet nex.PacketInterface, uiType notifications_constants.NotificationCategory, uiParam1 types.UInt64, uiParam2 types.UInt64, strParam types.String)
+	OnAfterGetFriendNotificationData                 func(packet nex.PacketInterface, uiType notifications_constants.NotificationCategorySigned)
+	OnAfterGetlstFriendNotificationData              func(packet nex.PacketInterface, lstTypes types.List[notifications_constants.NotificationCategory])
 	OnAfterFindMatchmakeSessionByGatheringIDDetail   func(packet nex.PacketInterface, gid types.UInt32)
 }
 
@@ -94,7 +96,7 @@ func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.Matchma
 
 	_, err = manager.Database.Exec(`CREATE TABLE IF NOT EXISTS matchmaking.community_participations (
 		id bigserial PRIMARY KEY,
-		user_pid numeric(10),
+		user_pid numeric(20),
 		gathering_id bigint,
 		participation_count bigint,
 		UNIQUE (user_pid, gathering_id)
@@ -106,10 +108,10 @@ func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.Matchma
 
 	_, err = manager.Database.Exec(`CREATE TABLE IF NOT EXISTS matchmaking.notifications (
 		id bigserial PRIMARY KEY,
-		source_pid numeric(10),
+		source_pid numeric(20),
 		type bigint,
-		param_1 bigint,
-		param_2 bigint,
+		param_1 numeric(20),
+		param_2 numeric(20),
 		param_str text,
 		active boolean NOT NULL DEFAULT true,
 		UNIQUE (source_pid, type)
@@ -122,7 +124,7 @@ func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.Matchma
 	_, err = manager.Database.Exec(`CREATE TABLE IF NOT EXISTS tracking.participate_community (
 		id bigserial PRIMARY KEY,
 		date timestamp,
-		source_pid numeric(10),
+		source_pid numeric(20),
 		community_gid bigint,
 		gathering_id bigint,
 		participation_count bigint
@@ -135,7 +137,7 @@ func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.Matchma
 	_, err = manager.Database.Exec(`CREATE TABLE IF NOT EXISTS tracking.notification_data (
 		id bigserial PRIMARY KEY,
 		date timestamp,
-		source_pid numeric(10),
+		source_pid numeric(20),
 		type bigint,
 		param_1 bigint,
 		param_2 bigint,
@@ -166,9 +168,9 @@ func NewCommonProtocol(protocol matchmake_extension.Interface) *CommonProtocol {
 	endpoint := protocol.Endpoint().(*nex.PRUDPEndPoint)
 
 	commonProtocol := &CommonProtocol{
-		endpoint: endpoint,
-		protocol: protocol,
-		PersistentGatheringCreationMax: 4, // * Default of 4 active persistent gatherings per user
+		endpoint:                       endpoint,
+		protocol:                       protocol,
+		PersistentGatheringCreationMax: constants.PersistentGatheringCreationMax, // * Default of 4 active persistent gatherings per user
 	}
 
 	protocol.SetHandlerOpenParticipation(commonProtocol.openParticipation)
