@@ -40,15 +40,19 @@ func (commonProtocol *CommonProtocol) joinMatchmakeSessionWithParam(err error, p
 		return nil, nexError
 	}
 
-	// TODO - Are these the correct error codes?
-	if bool(joinedMatchmakeSession.UserPasswordEnabled) && !joinMatchmakeSessionParam.StrUserPassword.Equals(joinedMatchmakeSession.UserPassword) {
+	// joinedMatchmakeSession.UserPasswordEnabled and joinedMatchmakeSession.SystemPasswordEnabled are only flags to inform the game wether the password is set,
+	// the passwords are always checked no matter what as can be seen by splatoon never setting the flags as it shares its info via friends instead of
+	// matchmaking lookup.
+	//
+	// if the password is unset and no password is specified they are empty anyhow so this wouldnt make a difference in the first place
+	if !joinMatchmakeSessionParam.StrUserPassword.Equals(joinedMatchmakeSession.UserPassword) {
 		commonProtocol.manager.Mutex.Unlock()
-		return nil, nex.NewError(nex.ResultCodes.RendezVous.InvalidPassword, "change_error")
+		return nil, nex.NewError(nex.ResultCodes.RendezVous.MatchmakeSessionUserPasswordUnmatch, "change_error")
 	}
 
-	if bool(joinedMatchmakeSession.SystemPasswordEnabled) && string(joinMatchmakeSessionParam.StrSystemPassword) != systemPassword {
+	if string(joinMatchmakeSessionParam.StrSystemPassword) != systemPassword {
 		commonProtocol.manager.Mutex.Unlock()
-		return nil, nex.NewError(nex.ResultCodes.RendezVous.InvalidPassword, "change_error")
+		return nil, nex.NewError(nex.ResultCodes.RendezVous.MatchmakeSessionSystemPasswordUnmatch, "change_error")
 	}
 
 	// * Allow game servers to do their own permissions checks
