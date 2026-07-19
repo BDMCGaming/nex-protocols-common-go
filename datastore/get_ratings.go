@@ -55,8 +55,8 @@ func (commonProtocol *CommonProtocol) getRatings(err error, packet nex.PacketInt
 		}
 
 		// * The owner of an object can always view their objects, but normal users cannot
-		if metaInfo.Status != types.UInt8(datastore_constants.DataStatusNone) && metaInfo.OwnerID != connection.PID() {
-			if metaInfo.Status == types.UInt8(datastore_constants.DataStatusPending) {
+		if metaInfo.Status != datastore_constants.DataStatusNone && metaInfo.OwnerID != connection.PID() {
+			if metaInfo.Status == datastore_constants.DataStatusPending {
 				pRatings = append(pRatings, invalidRatingInfoWithSlot)
 				pResults = append(pResults, types.NewQResultError(nex.ResultCodes.DataStore.UnderReviewing))
 				continue

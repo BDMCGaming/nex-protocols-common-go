@@ -49,10 +49,10 @@ func GetObjectMetaInfosByDataStoreSearchParam(manager *common_globals.DataStoreM
 		"expiration_date",
 	}
 
-	populateTags := (param.ResultOption & types.UInt8(datastore_constants.ResultFlagTags)) != 0
-	populateRatings := (param.ResultOption & types.UInt8(datastore_constants.ResultFlagRatings)) != 0
-	populateMetaBinary := (param.ResultOption & types.UInt8(datastore_constants.ResultFlagMetaBinary)) != 0
-	populateRecipientIDs := (param.ResultOption & types.UInt8(datastore_constants.ResultFlagPermittedIDs)) != 0
+	populateTags := (param.ResultOption & datastore_constants.ResultFlagTags) != 0
+	populateRatings := (param.ResultOption & datastore_constants.ResultFlagRatings) != 0
+	populateMetaBinary := (param.ResultOption & datastore_constants.ResultFlagMetaBinary) != 0
+	populateRecipientIDs := (param.ResultOption & datastore_constants.ResultFlagPermittedIDs) != 0
 
 	if populateTags {
 		columns = append(columns, "tags")

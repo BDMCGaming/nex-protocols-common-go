@@ -15,19 +15,19 @@ import (
 
 func UpdateObjectMetadata(manager *common_globals.DataStoreManager, currentData datastore_types.DataStoreMetaInfo, newData datastore_types.DataStoreChangeMetaParam) *nex.Error {
 	// * Do nothing if nothing to update
-	if newData.ModifiesFlag == types.UInt32(datastore_constants.ModificationFlagNone) {
+	if newData.ModifiesFlag == datastore_constants.ModificationFlagNone {
 		return nil
 	}
 
-	modifyName := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagName)) != 0
-	modifyAccessPermission := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagAccessPermission)) != 0
-	modifyUpdatePermission := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagUpdatePermission)) != 0
-	modifyPeriod := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagPeriod)) != 0
-	modifyMetaBinary := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagMetaBinary)) != 0
-	modifyTags := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagTags)) != 0
-	modifyUpdatedTime := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagUpdatedTime)) != 0
-	modifyDataType := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagDataType)) != 0
-	modifyStatus := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagStatus)) != 0
+	modifyName := (newData.ModifiesFlag & datastore_constants.ModificationFlagName) != 0
+	modifyAccessPermission := (newData.ModifiesFlag & datastore_constants.ModificationFlagAccessPermission) != 0
+	modifyUpdatePermission := (newData.ModifiesFlag & datastore_constants.ModificationFlagUpdatePermission) != 0
+	modifyPeriod := (newData.ModifiesFlag & datastore_constants.ModificationFlagPeriod) != 0
+	modifyMetaBinary := (newData.ModifiesFlag & datastore_constants.ModificationFlagMetaBinary) != 0
+	modifyTags := (newData.ModifiesFlag & datastore_constants.ModificationFlagTags) != 0
+	modifyUpdatedTime := (newData.ModifiesFlag & datastore_constants.ModificationFlagUpdatedTime) != 0
+	modifyDataType := (newData.ModifiesFlag & datastore_constants.ModificationFlagDataType) != 0
+	modifyStatus := (newData.ModifiesFlag & datastore_constants.ModificationFlagStatus) != 0
 
 	now := time.Now().UTC()
 	updateData := map[string]any{
@@ -43,7 +43,7 @@ func UpdateObjectMetadata(manager *common_globals.DataStoreManager, currentData 
 	}
 
 	if modifyAccessPermission {
-		if newData.Permission.Permission > types.UInt8(datastore_constants.PermissionSpecifiedFriend) {
+		if newData.Permission.Permission > datastore_constants.PermissionSpecifiedFriend {
 			return nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "Tried to update object with invalid access permission")
 		}
 
@@ -56,7 +56,7 @@ func UpdateObjectMetadata(manager *common_globals.DataStoreManager, currentData 
 	}
 
 	if modifyUpdatePermission {
-		if newData.DelPermission.Permission > types.UInt8(datastore_constants.PermissionSpecifiedFriend) {
+		if newData.DelPermission.Permission > datastore_constants.PermissionSpecifiedFriend {
 			return nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "Tried to update object with invalid update permission")
 		}
 
@@ -127,9 +127,9 @@ func UpdateObjectMetadata(manager *common_globals.DataStoreManager, currentData 
 	}
 
 	if modifyStatus {
-		if newData.Status != types.UInt8(datastore_constants.DataStatusNone) &&
-			newData.Status != types.UInt8(datastore_constants.DataStatusPending) &&
-			newData.Status != types.UInt8(datastore_constants.DataStatusRejected) {
+		if newData.Status != datastore_constants.DataStatusNone &&
+			newData.Status != datastore_constants.DataStatusPending &&
+			newData.Status != datastore_constants.DataStatusRejected {
 			return nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "change_error")
 		}
 
@@ -137,7 +137,7 @@ func UpdateObjectMetadata(manager *common_globals.DataStoreManager, currentData 
 		// * unless we know a client needs it. Allowing the status
 		// * to be updated would mean owners could bypass review checks
 		// * by setting the status to DataStatusNone
-		if currentData.Status != types.UInt8(datastore_constants.DataStatusNone) {
+		if currentData.Status != datastore_constants.DataStatusNone {
 			return nex.NewError(nex.ResultCodes.DataStore.Unknown, "change_error")
 		}
 

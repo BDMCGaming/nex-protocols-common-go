@@ -46,7 +46,7 @@ func (commonProtocol *CommonProtocol) preparePostObjectV1(err error, packet nex.
 	newParam.Tags = param.Tags
 	newParam.RatingInitParams = param.RatingInitParams
 
-	notUseFileServer := (newParam.Flag & types.UInt32(datastore_constants.DataFlagNotUseFileServer)) != 0
+	notUseFileServer := (newParam.Flag & datastore_constants.DataFlagNotUseFileServer) != 0
 	if notUseFileServer {
 		return nil, nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "PreparePostObjectV1 cannot be used with DataFlagNotUseFileServer")
 	}
@@ -72,7 +72,7 @@ func (commonProtocol *CommonProtocol) preparePostObjectV1(err error, packet nex.
 	}
 
 	// TODO - Should this be moved inside InsertObjectByPreparePostParam?
-	notifyAccessRecipientsOnCreation := (param.Flag & types.UInt32(datastore_constants.DataFlagUseNotificationOnPost)) != 0
+	notifyAccessRecipientsOnCreation := (param.Flag & datastore_constants.DataFlagUseNotificationOnPost) != 0
 	if notifyAccessRecipientsOnCreation {
 		recipientIDs, errCode := manager.GetNotificationRecipients(*manager, connection.PID(), param.Permission)
 		if errCode != nil {

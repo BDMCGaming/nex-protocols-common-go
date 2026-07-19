@@ -53,11 +53,11 @@ func (commonProtocol *CommonProtocol) prepareUpdateObject(err error, packet nex.
 	}
 
 	// * If the object is pending or rejected, only the owner can interact with it
-	if metaInfo.OwnerID != connection.PID() && (metaInfo.Status == types.UInt8(datastore_constants.DataStatusPending) || metaInfo.Status == types.UInt8(datastore_constants.DataStatusRejected)) {
+	if metaInfo.OwnerID != connection.PID() && (metaInfo.Status == datastore_constants.DataStatusPending || metaInfo.Status == datastore_constants.DataStatusRejected) {
 		return nil, nex.NewError(nex.ResultCodes.DataStore.NotFound, "change_error")
 	}
 
-	notUseFileServer := (metaInfo.Flag & types.UInt32(datastore_constants.DataFlagNotUseFileServer)) != 0
+	notUseFileServer := (metaInfo.Flag & datastore_constants.DataFlagNotUseFileServer) != 0
 	if notUseFileServer {
 		return nil, nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "PrepareUpdateObject cannot be used with DataFlagNotUseFileServer")
 	}
@@ -77,7 +77,7 @@ func (commonProtocol *CommonProtocol) prepareUpdateObject(err error, packet nex.
 		}
 	}
 
-	notifyAccessRecipientsOnUpdate := (metaInfo.Flag & types.UInt32(datastore_constants.DataFlagUseNotificationOnUpdate)) != 0
+	notifyAccessRecipientsOnUpdate := (metaInfo.Flag & datastore_constants.DataFlagUseNotificationOnUpdate) != 0
 	if notifyAccessRecipientsOnUpdate {
 		recipientIDs, errCode := manager.GetNotificationRecipients(*manager, metaInfo.OwnerID, metaInfo.Permission)
 		if errCode != nil {

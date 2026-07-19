@@ -18,12 +18,12 @@ func UpdateObjectByPrepareUpdateParam(manager *common_globals.DataStoreManager, 
 		return 0, nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "Tried to upload object larger than 10MiB")
 	}
 
-	needsReview := (currentData.Flag & types.UInt32(datastore_constants.DataFlagNeedReview)) != 0
-	needUploadCompletion := (currentData.Flag & types.UInt32(datastore_constants.DataFlagNeedCompletion)) != 0
+	needsReview := (currentData.Flag & datastore_constants.DataFlagNeedReview) != 0
+	needUploadCompletion := (currentData.Flag & datastore_constants.DataFlagNeedCompletion) != 0
 
 	status := currentData.Status
 	if needsReview {
-		status = types.UInt8(datastore_constants.DataStatusPending)
+		status = datastore_constants.DataStatusPending
 	}
 
 	uploadCompleted := false

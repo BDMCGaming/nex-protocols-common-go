@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/PretendoNetwork/nex-go/v2"
-	"github.com/PretendoNetwork/nex-go/v2/types"
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 	datastore_constants "github.com/PretendoNetwork/nex-protocols-go/v2/datastore/constants"
 	datastore_types "github.com/PretendoNetwork/nex-protocols-go/v2/datastore/types"
@@ -15,17 +14,17 @@ import (
 
 func UpdateObjectMetadataV1(manager *common_globals.DataStoreManager, currentData datastore_types.DataStoreMetaInfo, newData datastore_types.DataStoreChangeMetaParamV1) *nex.Error {
 	// * Do nothing if nothing to update
-	if newData.ModifiesFlag == types.UInt32(datastore_constants.ModificationFlagNone) {
+	if newData.ModifiesFlag == datastore_constants.ModificationFlagNone {
 		return nil
 	}
 
-	modifyName := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagName)) != 0
-	modifyAccessPermission := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagAccessPermission)) != 0
-	modifyUpdatePermission := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagUpdatePermission)) != 0
-	modifyPeriod := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagPeriod)) != 0
-	modifyMetaBinary := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagMetaBinary)) != 0
-	modifyTags := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagTags)) != 0
-	modifyUpdatedTime := (newData.ModifiesFlag & types.UInt32(datastore_constants.ModificationFlagUpdatedTime)) != 0
+	modifyName := (newData.ModifiesFlag & datastore_constants.ModificationFlagName) != 0
+	modifyAccessPermission := (newData.ModifiesFlag & datastore_constants.ModificationFlagAccessPermission) != 0
+	modifyUpdatePermission := (newData.ModifiesFlag & datastore_constants.ModificationFlagUpdatePermission) != 0
+	modifyPeriod := (newData.ModifiesFlag & datastore_constants.ModificationFlagPeriod) != 0
+	modifyMetaBinary := (newData.ModifiesFlag & datastore_constants.ModificationFlagMetaBinary) != 0
+	modifyTags := (newData.ModifiesFlag & datastore_constants.ModificationFlagTags) != 0
+	modifyUpdatedTime := (newData.ModifiesFlag & datastore_constants.ModificationFlagUpdatedTime) != 0
 
 	now := time.Now().UTC()
 	updateData := map[string]any{
@@ -41,7 +40,7 @@ func UpdateObjectMetadataV1(manager *common_globals.DataStoreManager, currentDat
 	}
 
 	if modifyAccessPermission {
-		if newData.Permission.Permission > types.UInt8(datastore_constants.PermissionSpecifiedFriend) {
+		if newData.Permission.Permission > datastore_constants.PermissionSpecifiedFriend {
 			return nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "Tried to update object with invalid access permission")
 		}
 
@@ -54,7 +53,7 @@ func UpdateObjectMetadataV1(manager *common_globals.DataStoreManager, currentDat
 	}
 
 	if modifyUpdatePermission {
-		if newData.DelPermission.Permission > types.UInt8(datastore_constants.PermissionSpecifiedFriend) {
+		if newData.DelPermission.Permission > datastore_constants.PermissionSpecifiedFriend {
 			return nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "Tried to update object with invalid update permission")
 		}
 
