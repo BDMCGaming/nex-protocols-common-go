@@ -48,9 +48,9 @@ type S3Manager interface {
 
 // S3 represents an S3 configuration for a specific bucket
 type S3 struct {
-	Bucket        string
-	KeyBase       string
-	Manager       S3Manager
+	Bucket  string
+	KeyBase string
+	Manager S3Manager
 }
 
 // PresignGet creates a presigned GET request for a given object
@@ -161,9 +161,9 @@ type DataStoreManager struct {
 // Only one bucket can be configured at a time
 func (dsm *DataStoreManager) SetS3Config(bucket, keyBase string, manager S3Manager) {
 	dsm.S3 = &S3{
-		Bucket:        bucket,
-		KeyBase:       keyBase,
-		Manager:       manager,
+		Bucket:  bucket,
+		KeyBase: keyBase,
+		Manager: manager,
 	}
 }
 
@@ -179,7 +179,7 @@ func verifyObjectUpdatePermission(dsm DataStoreManager, requesterPID types.PID, 
 
 // verifyObjectPermission is the default implementation that verifies that a given set of permissions is allowed
 func verifyObjectPermission(dsm DataStoreManager, ownerPID, requesterPID types.PID, permission datastore_types.DataStorePermission, objectPassword, requesterPassword types.UInt64) *nex.Error {
-	if permission.Permission > types.UInt8(datastore_constants.PermissionSpecifiedFriend) {
+	if permission.Permission > datastore_constants.PermissionSpecifiedFriend {
 		return nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "change_error")
 	}
 
@@ -197,11 +197,11 @@ func verifyObjectPermission(dsm DataStoreManager, ownerPID, requesterPID types.P
 	// * Standard permission checks
 	var err *nex.Error
 
-	if permission.Permission == types.UInt8(datastore_constants.PermissionPublic) {
+	if permission.Permission == datastore_constants.PermissionPublic {
 		return nil
 	}
 
-	if permission.Permission == types.UInt8(datastore_constants.PermissionFriend) {
+	if permission.Permission == datastore_constants.PermissionFriend {
 		if dsm.GetUserFriendPIDs == nil {
 			return nex.NewError(nex.ResultCodes.DataStore.PermissionDenied, "change_error")
 		}
@@ -214,19 +214,19 @@ func verifyObjectPermission(dsm DataStoreManager, ownerPID, requesterPID types.P
 		}
 	}
 
-	if permission.Permission == types.UInt8(datastore_constants.PermissionSpecified) {
+	if permission.Permission == datastore_constants.PermissionSpecified {
 		if !permission.RecipientIDs.Contains(requesterPID) {
 			err = nex.NewError(nex.ResultCodes.DataStore.PermissionDenied, "change_error")
 		}
 	}
 
-	if permission.Permission == types.UInt8(datastore_constants.PermissionPrivate) {
+	if permission.Permission == datastore_constants.PermissionPrivate {
 		if !ownerPID.Equals(requesterPID) {
 			err = nex.NewError(nex.ResultCodes.DataStore.PermissionDenied, "change_error")
 		}
 	}
 
-	if permission.Permission == types.UInt8(datastore_constants.PermissionSpecifiedFriend) {
+	if permission.Permission == datastore_constants.PermissionSpecifiedFriend {
 		if dsm.GetUserFriendPIDs == nil {
 			return nex.NewError(nex.ResultCodes.DataStore.PermissionDenied, "change_error")
 		}
@@ -384,13 +384,13 @@ func validateExtraData(dsm DataStoreManager, extraData types.List[types.String])
 func calculateRatingExpirationTime(dsm DataStoreManager, settings datastore_types.DataStoreRatingInitParam) time.Time {
 	now := time.Now().UTC()
 
-	if settings.LockType == types.UInt8(datastore_constants.RatingLockInterval) {
+	if settings.LockType == datastore_constants.RatingLockInterval {
 		// * RATING_LOCK_INTERVAL treats PeriodDuration as a number of seconds
 		// * that the user should be locked for
 		return now.Add(time.Duration(settings.PeriodDuration) * time.Second)
 	}
 
-	if settings.LockType == types.UInt8(datastore_constants.RatingLockPeriod) {
+	if settings.LockType == datastore_constants.RatingLockPeriod {
 		// * RATING_LOCK_PERIOD treats PeriodDuration as the day of the week/month
 		// * the lock should expire, and PeriodHour as the time of that day.
 		// *
@@ -463,7 +463,7 @@ func getNotificationRecipients(dsm DataStoreManager, ownerPID types.PID, permiss
 	var recipientIDs types.List[types.PID]
 
 	// TODO - What should happen in other permission types?
-	if permission.Permission == types.UInt8(datastore_constants.PermissionFriend) {
+	if permission.Permission == datastore_constants.PermissionFriend {
 		if dsm.GetUserFriendPIDs == nil {
 			return nil, nex.NewError(nex.ResultCodes.DataStore.Unknown, "change_error")
 		}
@@ -475,9 +475,9 @@ func getNotificationRecipients(dsm DataStoreManager, ownerPID types.PID, permiss
 		for i, friendPID := range friendsList {
 			recipientIDs[i] = types.PID(friendPID)
 		}
-	} else if permission.Permission == types.UInt8(datastore_constants.PermissionSpecified) {
+	} else if permission.Permission == datastore_constants.PermissionSpecified {
 		recipientIDs = permission.RecipientIDs
-	} else if permission.Permission == types.UInt8(datastore_constants.PermissionSpecifiedFriend) {
+	} else if permission.Permission == datastore_constants.PermissionSpecifiedFriend {
 		if dsm.GetUserFriendPIDs == nil {
 			return nil, nex.NewError(nex.ResultCodes.DataStore.Unknown, "change_error")
 		}
