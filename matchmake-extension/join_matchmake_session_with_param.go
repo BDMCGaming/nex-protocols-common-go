@@ -40,11 +40,6 @@ func (commonProtocol *CommonProtocol) joinMatchmakeSessionWithParam(err error, p
 		return nil, nexError
 	}
 
-	// joinedMatchmakeSession.UserPasswordEnabled and joinedMatchmakeSession.SystemPasswordEnabled are only flags to inform the game wether the password is set,
-	// the passwords are always checked no matter what as can be seen by splatoon never setting the flags as it shares its info via friends instead of
-	// matchmaking lookup.
-	//
-	// if the password is unset and no password is specified they are empty anyhow so this wouldnt make a difference in the first place
 	if !joinMatchmakeSessionParam.StrUserPassword.Equals(joinedMatchmakeSession.UserPassword) {
 		commonProtocol.manager.Mutex.Unlock()
 		return nil, nex.NewError(nex.ResultCodes.RendezVous.MatchmakeSessionUserPasswordUnmatch, "change_error")

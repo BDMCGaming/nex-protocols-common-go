@@ -16,7 +16,7 @@ import (
 )
 
 // FindMatchmakeSessionBySearchCriteria finds matchmake sessions with the given search criterias
-func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingManager, connection *nex.PRUDPConnection, searchCriterias []match_making_types.MatchmakeSessionSearchCriteria, resultRange types.ResultRange, matchmake bool, sourceMatchmakeSession *match_making_types.MatchmakeSession) ([]match_making_types.MatchmakeSession, *nex.Error) {
+func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingManager, connection *nex.PRUDPConnection, searchCriterias []match_making_types.MatchmakeSessionSearchCriteria, resultRange types.ResultRange, publicSession bool, sourceMatchmakeSession *match_making_types.MatchmakeSession) ([]match_making_types.MatchmakeSession, *nex.Error) {
 	resultMatchmakeSessions := make([]match_making_types.MatchmakeSession, 0)
 
 	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
@@ -208,7 +208,7 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 			}
 		}
 
-		if matchmake {
+		if publicSession {
 			searchStatement += ` AND ms.user_password="" AND ms.system_password=""`
 		}
 
