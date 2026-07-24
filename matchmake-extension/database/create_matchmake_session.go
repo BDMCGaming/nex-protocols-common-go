@@ -40,6 +40,13 @@ func CreateMatchmakeSession(manager *common_globals.MatchmakingManager, connecti
 
 	matchmakeSession.StartedTime = startedTime
 	matchmakeSession.SessionKey = make([]byte, 32)
+
+	if len(matchmakeSession.UserPassword) > 0 {
+		matchmakeSession.UserPasswordEnabled = true
+	} else {
+		matchmakeSession.UserPasswordEnabled = false
+	}
+
 	matchmakeSession.SystemPasswordEnabled = false
 	rand.Read(matchmakeSession.SessionKey)
 

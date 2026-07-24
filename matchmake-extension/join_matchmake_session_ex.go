@@ -24,7 +24,7 @@ func (commonProtocol *CommonProtocol) joinMatchmakeSessionEx(err error, packet n
 	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
 	server := endpoint.Server
 
-	joinedMatchmakeSession, systemPassword, nexError := database.GetMatchmakeSessionByID(commonProtocol.manager, endpoint, uint32(gid))
+	joinedMatchmakeSession, _, nexError := database.GetMatchmakeSessionByID(commonProtocol.manager, endpoint, uint32(gid))
 	if nexError != nil {
 		common_globals.Logger.Error(nexError.Error())
 		commonProtocol.manager.Mutex.Unlock()
@@ -32,7 +32,7 @@ func (commonProtocol *CommonProtocol) joinMatchmakeSessionEx(err error, packet n
 	}
 
 	// TODO - Is this the correct error code?
-	if string(joinedMatchmakeSession.UserPassword) != "" || systemPassword != "" {
+	if joinedMatchmakeSession.UserPasswordEnabled || joinedMatchmakeSession.SystemPasswordEnabled {
 		commonProtocol.manager.Mutex.Unlock()
 		return nil, nex.NewError(nex.ResultCodes.RendezVous.PermissionDenied, "change_error")
 	}

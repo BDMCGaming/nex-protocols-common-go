@@ -16,7 +16,7 @@ import (
 )
 
 // FindMatchmakeSessionBySearchCriteria finds matchmake sessions with the given search criterias
-func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingManager, connection *nex.PRUDPConnection, searchCriterias []match_making_types.MatchmakeSessionSearchCriteria, resultRange types.ResultRange, publicSession bool, sourceMatchmakeSession *match_making_types.MatchmakeSession) ([]match_making_types.MatchmakeSession, *nex.Error) {
+func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingManager, connection *nex.PRUDPConnection, searchCriterias []match_making_types.MatchmakeSessionSearchCriteria, resultRange types.ResultRange, sourceMatchmakeSession *match_making_types.MatchmakeSession, isAutoMatchmake bool) ([]match_making_types.MatchmakeSession, *nex.Error) {
 	resultMatchmakeSessions := make([]match_making_types.MatchmakeSession, 0)
 
 	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
@@ -31,6 +31,15 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 	}
 
 	for _, searchCriteria := range searchCriterias {
+		// * If doing auto-matchmake, only allow sessions where the user is able to join
+		if isAutoMatchmake {
+			searchCriteria.VacantOnly = true
+			searchCriteria.ExcludeLocked = true
+			searchCriteria.ExcludeNonHostPID = true
+			searchCriteria.ExcludeUserPasswordSet = true
+			searchCriteria.ExcludeSystemPasswordSet = true
+		}
+
 		searchStatement := `SELECT
 			g.id,
 			g.owner_pid,
@@ -206,10 +215,6 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 
 				searchStatement += fmt.Sprintf(` AND ms.matchmake_system_type=%d`, value)
 			}
-		}
-
-		if publicSession {
-			searchStatement += ` AND ms.user_password="" AND ms.system_password=""`
 		}
 
 		// * Filter full sessions if necessary
