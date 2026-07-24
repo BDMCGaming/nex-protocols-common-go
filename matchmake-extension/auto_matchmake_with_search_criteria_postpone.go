@@ -49,7 +49,7 @@ func (commonProtocol *CommonProtocol) autoMatchmakeWithSearchCriteriaPostpone(er
 
 	resultRange := types.NewResultRange()
 	resultRange.Length = 1
-	resultSessions, nexError := database.FindMatchmakeSessionBySearchCriteria(commonProtocol.manager, connection, lstSearchCriteria, resultRange, &matchmakeSession)
+	resultSessions, nexError := database.FindMatchmakeSessionBySearchCriteria(commonProtocol.manager, connection, lstSearchCriteria, resultRange, &matchmakeSession, true)
 	if nexError != nil {
 		commonProtocol.manager.Mutex.Unlock()
 		return nil, nexError
@@ -66,12 +66,6 @@ func (commonProtocol *CommonProtocol) autoMatchmakeWithSearchCriteriaPostpone(er
 		}
 	} else {
 		resultSession = resultSessions[0]
-
-		// TODO - What should really happen here?
-		if resultSession.UserPasswordEnabled || resultSession.SystemPasswordEnabled {
-			commonProtocol.manager.Mutex.Unlock()
-			return nil, nex.NewError(nex.ResultCodes.RendezVous.PermissionDenied, "change_error")
-		}
 	}
 
 	var vacantParticipants uint16 = 1

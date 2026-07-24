@@ -44,7 +44,7 @@ func (commonProtocol *CommonProtocol) autoMatchmakeWithParamPostpone(err error, 
 
 	resultRange := types.NewResultRange()
 	resultRange.Length = 1
-	resultSessions, nexError := database.FindMatchmakeSessionBySearchCriteria(commonProtocol.manager, connection, autoMatchmakeParam.LstSearchCriteria, resultRange, &autoMatchmakeParam.SourceMatchmakeSession)
+	resultSessions, nexError := database.FindMatchmakeSessionBySearchCriteria(commonProtocol.manager, connection, autoMatchmakeParam.LstSearchCriteria, resultRange, &autoMatchmakeParam.SourceMatchmakeSession, true)
 	if nexError != nil {
 		commonProtocol.manager.Mutex.Unlock()
 		return nil, nexError
@@ -61,12 +61,6 @@ func (commonProtocol *CommonProtocol) autoMatchmakeWithParamPostpone(err error, 
 		}
 	} else {
 		resultSession = resultSessions[0]
-
-		// TODO - What should really happen here?
-		if resultSession.UserPasswordEnabled || resultSession.SystemPasswordEnabled {
-			commonProtocol.manager.Mutex.Unlock()
-			return nil, nex.NewError(nex.ResultCodes.RendezVous.PermissionDenied, "change_error")
-		}
 	}
 
 	participants, nexError := database.JoinMatchmakeSessionWithParticipants(commonProtocol.manager, resultSession, connection, autoMatchmakeParam.AdditionalParticipants, string(autoMatchmakeParam.JoinMessage), constants.JoinMatchmakeSessionBehaviorJoinMyself)
