@@ -69,7 +69,9 @@ func ValidatePNLoginData(pid types.PID, loginData types.DataHolder, gameServerID
 		Token:         tokenBase64,
 	})
 	if err != nil {
-		return nex.NewError(nex.ResultCodes.Authentication.ValidationFailed, err.Error())
+		// * If GRPC respondes with an error, it means the token has expired or wasn't valid to begin with.
+		// * `TokenExpired` will force the console to request a new token
+		return nex.NewError(nex.ResultCodes.Authentication.TokenExpired, err.Error())
 	}
 
 	// * The account server database separates all the token types into their own
